@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .canvas {
+        background-color: #f0f0f0;
+        display: block;
+        margin: auto;
+        border: 1px solid black;
+        border-radius: 5px;
+    }
+</style>
+
+<body>
+    <canvas class="canvas"></canvas>
+    <script>
+        const canvas = document.querySelector('.canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth/2;
+        canvas.height = window.innerHeight/2;
+        var lasers = [];
+        var enemies = [];
+        var score = 0;
+        var gameFrame = 0;
+        var directionLaserX = true;
+        var directionLaserY = true;
+        const ship = {
+            x: 75,
+            y: 50,
+            dx: 0,
+            dy: 0,
+            width: 25,
+            color: 'black',
+            height: 25,
+        }
+        function lasersDraw() {
+            for (let i = 0; i < lasers.length; i++) {
+                if(directionLaserX) {
+                    directionLaserY = false;
+                }
+                if(!directionLaserX) {
+                    directionLaserY = true;
+                }
+                if(directionLaserX){
+                    lasers[i].x += 1;
+                }else if(!directionLaserX){
+                    lasers[i].x -= 1;
+                }
+                if(directionLaserY){
+                    lasers[i].y += 1;
+                }else if(!directionLaserY){
+                    lasers[i].y -= 1;
+                }
+                ctx.fillStyle = lasers[i].color;
+                ctx.fillRect(lasers[i].x, lasers[i].y, lasers[i].width, lasers[i].height);
+            }
+        }
+        function shipDraw() {
+            ship.x += ship.dx;
+            ship.y += ship.dy;
+            if (ship.x < 0) {
+                ship.x = 0;
+            }
+            if (ship.x + ship.width > canvas.width) {
+                ship.x = canvas.width - ship.width;
+            }
+            if (ship.y < 0) {
+                ship.y = 0;
+            }
+            if (ship.y + ship.height > canvas.height) {
+                ship.y = canvas.height - ship.height;
+            }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = ship.color;
+            ctx.fillRect(ship.x, ship.y, ship.width, ship.height);
+        }
+        document.addEventListener('keydown', function (e) {
+            switch (e.key) {
+                case 'a':
+                    ship.dx = -1;
+                    directionLaserX = false;
+                    break;
+                case 'd':
+                    ship.dx = 1;
+                    directionLaserX = true;
+                    break;
+                case 'w':
+                    ship.dy = -1;
+                    directionLaserY = false;
+                    break;
+                case 's':
+                    ship.dy = 1;
+                    directionLaserY = true;
+                    break;
+                case ' ':
+                    lasers.push({
+                        x: ship.x + ship.width / 2,
+                        y: ship.y,
+                        width: 2,
+                        height: 10,
+                        color: 'red'
+                    });
+                    break;
+            }
+        });
+        document.addEventListener('keyup', function (e) {
+            switch (e.key) {
+                case 'a':
+                    ship.dx = 0;
+                    break;
+                case 'd':
+                    ship.dx = 0;
+                    break;
+                case 'w':
+                    ship.dy = 0;
+                    break;
+                case 's':
+                    ship.dy = 0;
+                    break;
+            }
+        });
+        function anime(){
+            shipDraw();
+            lasersDraw();
+            requestAnimationFrame(anime);
+        }
+        anime();
+    </script>
+</body>
+
+</html>
