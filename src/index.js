@@ -8,6 +8,7 @@ app.set('views', './src/views');
 
 // Middleware CORS para permitir solicitudes de otros orígenes
 app.use(cors());
+app.use(express.static('public'));
 
 // Rutas
 app.get('/', (req, res) => {

@@ -27,14 +27,40 @@
     <script>
         const canvas = document.querySelector('.canvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth/2;
-        canvas.height = window.innerHeight/2;
+        canvas.width = window.innerWidth / 2;
+        canvas.height = window.innerHeight / 2;
+        let enemy_1= new Image();
+        enemy_1.src = 'alataya.jpg';
+        let enemy_2= new Image();
+        enemy_2.src = 'learn.jpg';
+        let enemy_3= new Image();
+        enemy_3.src = 'milibrodehistorias.jpeg';
+        const enemies = [
+            {
+                x: 100,
+                y: 100,
+                width: 50,
+                height: 50,
+                image: enemy_1
+            },
+            {
+                x: 200,
+                y: 200,
+                width: 50,
+                height: 50,
+                image: enemy_2
+            },
+            {
+                x: 300,
+                y: 300,
+                width: 50,
+                height: 50,
+                image: enemy_3
+            }
+        ];
         var lasers = [];
-        var enemies = [];
-        var score = 0;
-        var gameFrame = 0;
-        var directionLaserX = true;
-        var directionLaserY = true;
+        var direction = ''; // Nueva variable para la dirección actual del cuadro negro
+
         const ship = {
             x: 75,
             y: 50,
@@ -43,29 +69,27 @@
             width: 25,
             color: 'black',
             height: 25,
-        }
+        };
+
         function lasersDraw() {
             for (let i = 0; i < lasers.length; i++) {
-                if(directionLaserX) {
-                    directionLaserY = false;
-                }
-                if(!directionLaserX) {
-                    directionLaserY = true;
-                }
-                if(directionLaserX){
-                    lasers[i].x += 1;
-                }else if(!directionLaserX){
-                    lasers[i].x -= 1;
-                }
-                if(directionLaserY){
-                    lasers[i].y += 1;
-                }else if(!directionLaserY){
-                    lasers[i].y -= 1;
+                // Mover los láseres en la dirección correspondiente
+                if (lasers[i].direction === 'horizontal') {
+                    lasers[i].x += lasers[i].speed;
+                } else if (lasers[i].direction === 'vertical') {
+                    lasers[i].y += lasers[i].speed;
                 }
                 ctx.fillStyle = lasers[i].color;
                 ctx.fillRect(lasers[i].x, lasers[i].y, lasers[i].width, lasers[i].height);
             }
         }
+
+        function enemiesDraw(){
+            for(let i=0; i<enemies.length;i++){
+                ctx.drawImage(enemies[i].image, enemies[i].x, enemies[i].y, enemies[i].width, enemies[i].height)
+            }
+        }
+
         function shipDraw() {
             ship.x += ship.dx;
             ship.y += ship.dy;
@@ -85,56 +109,59 @@
             ctx.fillStyle = ship.color;
             ctx.fillRect(ship.x, ship.y, ship.width, ship.height);
         }
+
         document.addEventListener('keydown', function (e) {
             switch (e.key) {
                 case 'a':
                     ship.dx = -1;
-                    directionLaserX = false;
+                    direction = 'horizontal'; // Cambiar la dirección a horizontal
                     break;
                 case 'd':
                     ship.dx = 1;
-                    directionLaserX = true;
+                    direction = 'horizontal'; // Cambiar la dirección a horizontal
                     break;
                 case 'w':
                     ship.dy = -1;
-                    directionLaserY = false;
+                    direction = 'vertical'; // Cambiar la dirección a vertical
                     break;
                 case 's':
                     ship.dy = 1;
-                    directionLaserY = true;
+                    direction = 'vertical'; // Cambiar la dirección a vertical
                     break;
                 case ' ':
                     lasers.push({
                         x: ship.x + ship.width / 2,
-                        y: ship.y,
-                        width: 2,
-                        height: 10,
-                        color: 'red'
+                        y: ship.y + ship.height / 2,
+                        width: direction === 'horizontal' ? 10 : 2, // Ajustar ancho según dirección
+                        height: direction === 'vertical' ? 10 : 2, // Ajustar altura según dirección
+                        color: 'red',
+                        speed: direction === 'horizontal' ? (ship.dx || 1) * 5 : (ship.dy || 1) * 5, // Velocidad según dirección
+                        direction: direction // Guardar la dirección actual
                     });
                     break;
             }
         });
+
         document.addEventListener('keyup', function (e) {
             switch (e.key) {
                 case 'a':
-                    ship.dx = 0;
-                    break;
                 case 'd':
                     ship.dx = 0;
                     break;
                 case 'w':
-                    ship.dy = 0;
-                    break;
                 case 's':
                     ship.dy = 0;
                     break;
             }
         });
-        function anime(){
+
+        function anime() {
             shipDraw();
             lasersDraw();
+            enemiesDraw();
             requestAnimationFrame(anime);
         }
+
         anime();
     </script>
 </body>
