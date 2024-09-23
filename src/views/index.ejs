@@ -29,12 +29,13 @@
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth / 2;
         canvas.height = window.innerHeight / 2;
-        let enemy_1= new Image();
+        let enemy_1 = new Image();
         enemy_1.src = 'alataya.jpg';
-        let enemy_2= new Image();
+        let enemy_2 = new Image();
         enemy_2.src = 'learn.jpg';
-        let enemy_3= new Image();
+        let enemy_3 = new Image();
         enemy_3.src = 'milibrodehistorias.jpeg';
+
         const enemies = [
             {
                 x: 100,
@@ -84,9 +85,33 @@
             }
         }
 
-        function enemiesDraw(){
-            for(let i=0; i<enemies.length;i++){
-                ctx.drawImage(enemies[i].image, enemies[i].x, enemies[i].y, enemies[i].width, enemies[i].height)
+        function enemiesDraw() {
+            for (let i = 0; i < enemies.length; i++) {
+                ctx.drawImage(enemies[i].image, enemies[i].x, enemies[i].y, enemies[i].width, enemies[i].height);
+            }
+        }
+
+        // Función para detectar colisión
+        function isColliding(rect1, rect2) {
+            return (
+                rect1.x < rect2.x + rect2.width &&
+                rect1.x + rect1.width > rect2.x &&
+                rect1.y < rect2.y + rect2.height &&
+                rect1.y + rect1.height > rect2.y
+            );
+        }
+
+        function checkCollisions() {
+            // Recorremos cada láser y comprobamos si colisiona con algún enemigo
+            for (let i = lasers.length - 1; i >= 0; i--) {
+                for (let j = enemies.length - 1; j >= 0; j--) {
+                    if (isColliding(lasers[i], enemies[j])) {
+                        // Si colisionan, eliminar ambos (láser y enemigo)
+                        lasers.splice(i, 1);
+                        enemies.splice(j, 1);
+                        break; // Salir del bucle para evitar errores con índices
+                    }
+                }
             }
         }
 
@@ -159,10 +184,12 @@
             shipDraw();
             lasersDraw();
             enemiesDraw();
+            checkCollisions(); // Revisamos colisiones en cada frame
             requestAnimationFrame(anime);
         }
 
         anime();
+
     </script>
 </body>
 
